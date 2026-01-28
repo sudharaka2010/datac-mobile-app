@@ -20,12 +20,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final passCtrl = TextEditingController();
   final confirmCtrl = TextEditingController();
 
+  final _emailNode = FocusNode();
+  final _nameNode = FocusNode();
+  final _userNode = FocusNode();
+  final _passNode = FocusNode();
+  final _confirmNode = FocusNode();
+
   bool hidePassword = true;
   bool hideConfirm = true;
   bool agree = true;
 
   @override
   void dispose() {
+    _emailNode.dispose();
+    _nameNode.dispose();
+    _userNode.dispose();
+    _passNode.dispose();
+    _confirmNode.dispose();
+
     emailCtrl.dispose();
     nameCtrl.dispose();
     usernameCtrl.dispose();
@@ -35,34 +47,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _signup() {
-    if (_formKey.currentState!.validate()) {
+    FocusScope.of(context).unfocus();
+    if (_formKey.currentState?.validate() ?? false) {
       Navigator.pushReplacementNamed(context, DashboardScreen.route);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const datacColor = Color.fromRGBO(48, 50, 61, 1);
+    final text = Theme.of(context).textTheme;
 
-    final glassColor =
-        const Color.fromRGBO(14, 18, 32, 1).withValues(alpha: 0.72);
+    final glassColor = const Color.fromRGBO(14, 18, 32, 1).withValues(alpha: 0.72);
     final borderColor = Colors.white.withValues(alpha: 0.10);
 
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background
           Image.asset(
             'assets/images/bg_login.jpg',
             fit: BoxFit.cover,
             alignment: Alignment.topCenter,
           ),
-
-          // Soft overlay
           Container(color: Colors.black.withValues(alpha: 0.08)),
-
-          // Bottom gradient
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -83,29 +90,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
           SafeArea(
             child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverPadding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
                   sliver: SliverFillRemaining(
-                    hasScrollBody: false, // ✅ centered & safe
+                    hasScrollBody: false,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Top-right brand
                         const Align(
                           alignment: Alignment.topRight,
                           child: Text(
                             'DATAC',
                             style: TextStyle(
                               fontFamily: 'Inter',
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w900,
                               fontSize: 34,
-                              color: datacColor,
+                              color: Colors.white,
+                              letterSpacing: 0.2,
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 14),
 
                         Expanded(
@@ -118,236 +124,250 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 radius: 22,
                                 blur: 14,
                                 padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
-                                child: Form(
-                                  key: _formKey,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: [
-                                      const Text(
-                                        'Create account',
-                                        style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 24,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        'Sign up to start collecting and managing data.',
-                                        style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          color: Colors.white.withValues(alpha: 0.65),
-                                          fontSize: 12.8,
-                                          height: 1.3,
-                                        ),
-                                      ),
-
-                                      const SizedBox(height: 18),
-
-                                      _input(
-                                        controller: emailCtrl,
-                                        label: 'Email / Phone',
-                                        hint: 'example@email.com',
-                                        obscure: false,
-                                        prefix: Icon(
-                                          Icons.alternate_email_rounded,
-                                          color: Colors.white.withValues(alpha: 0.60),
-                                          size: 20,
-                                        ),
-                                        validator: (v) =>
-                                            (v == null || v.trim().isEmpty)
-                                                ? 'Required'
-                                                : null,
-                                      ),
-
-                                      const SizedBox(height: 14),
-
-                                      _input(
-                                        controller: nameCtrl,
-                                        label: 'Full name',
-                                        hint: 'Your name',
-                                        obscure: false,
-                                        prefix: Icon(
-                                          Icons.person_outline_rounded,
-                                          color: Colors.white.withValues(alpha: 0.60),
-                                          size: 20,
-                                        ),
-                                        validator: (v) =>
-                                            (v == null || v.trim().isEmpty)
-                                                ? 'Required'
-                                                : null,
-                                      ),
-
-                                      const SizedBox(height: 14),
-
-                                      _input(
-                                        controller: usernameCtrl,
-                                        label: 'Username',
-                                        hint: 'username',
-                                        obscure: false,
-                                        prefix: Icon(
-                                          Icons.badge_outlined,
-                                          color: Colors.white.withValues(alpha: 0.60),
-                                          size: 20,
-                                        ),
-                                        validator: (v) =>
-                                            (v == null || v.trim().isEmpty)
-                                                ? 'Required'
-                                                : null,
-                                      ),
-
-                                      const SizedBox(height: 14),
-
-                                      _input(
-                                        controller: passCtrl,
-                                        label: 'Password',
-                                        hint: '••••••••',
-                                        obscure: hidePassword,
-                                        prefix: Icon(
-                                          Icons.lock_outline_rounded,
-                                          color: Colors.white.withValues(alpha: 0.60),
-                                          size: 20,
-                                        ),
-                                        suffix: IconButton(
-                                          onPressed: () => setState(
-                                              () => hidePassword = !hidePassword),
-                                          icon: Icon(
-                                            hidePassword
-                                                ? Icons.visibility_off_rounded
-                                                : Icons.visibility_rounded,
-                                            color: Colors.white.withValues(alpha: 0.65),
-                                            size: 20,
+                                child: AutofillGroup(
+                                  child: Form(
+                                    key: _formKey,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        Text(
+                                          'Create account',
+                                          style: text.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 24,
                                           ),
                                         ),
-                                        validator: (v) {
-                                          if (v == null || v.isEmpty) return 'Required';
-                                          if (v.length < 4) return 'Min 4 characters';
-                                          return null;
-                                        },
-                                      ),
-
-                                      const SizedBox(height: 14),
-
-                                      _input(
-                                        controller: confirmCtrl,
-                                        label: 'Confirm password',
-                                        hint: '••••••••',
-                                        obscure: hideConfirm,
-                                        prefix: Icon(
-                                          Icons.lock_outline_rounded,
-                                          color: Colors.white.withValues(alpha: 0.60),
-                                          size: 20,
-                                        ),
-                                        suffix: IconButton(
-                                          onPressed: () => setState(
-                                              () => hideConfirm = !hideConfirm),
-                                          icon: Icon(
-                                            hideConfirm
-                                                ? Icons.visibility_off_rounded
-                                                : Icons.visibility_rounded,
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          'Sign up to start collecting and managing data.',
+                                          style: text.bodySmall?.copyWith(
                                             color: Colors.white.withValues(alpha: 0.65),
-                                            size: 20,
                                           ),
                                         ),
-                                        validator: (v) {
-                                          if (v == null || v.isEmpty) return 'Required';
-                                          if (v != passCtrl.text) return 'Password not match';
-                                          return null;
-                                        },
-                                      ),
 
-                                      const SizedBox(height: 12),
+                                        const SizedBox(height: 18),
 
-                                      Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 18,
-                                            height: 18,
-                                            child: Checkbox(
-                                              value: agree,
-                                              onChanged: (v) =>
-                                                  setState(() => agree = v ?? false),
-                                              side: BorderSide(
-                                                color: Colors.white.withValues(alpha: 0.55),
-                                              ),
-                                              activeColor: Colors.white,
-                                              checkColor: Colors.black,
+                                        // Email
+                                        TextFormField(
+                                          controller: emailCtrl,
+                                          focusNode: _emailNode,
+                                          keyboardType: TextInputType.emailAddress,
+                                          textInputAction: TextInputAction.next,
+                                          autofillHints: const [AutofillHints.email],
+                                          onFieldSubmitted: (_) => _nameNode.requestFocus(),
+                                          validator: (v) {
+                                            final s = (v ?? '').trim();
+                                            if (s.isEmpty) return 'Required';
+                                            if (!s.contains('@')) return 'Enter a valid email';
+                                            return null;
+                                          },
+                                          decoration: InputDecoration(
+                                            labelText: 'Email',
+                                            hintText: 'example@email.com',
+                                            prefixIcon: Icon(
+                                              Icons.alternate_email_rounded,
+                                              color: Colors.white.withValues(alpha: 0.65),
                                             ),
                                           ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: Text(
-                                              'I agree to the Terms & Privacy',
-                                              style: TextStyle(
-                                                fontFamily: 'Inter',
+                                        ),
+
+                                        const SizedBox(height: 14),
+
+                                        // Full name
+                                        TextFormField(
+                                          controller: nameCtrl,
+                                          focusNode: _nameNode,
+                                          textInputAction: TextInputAction.next,
+                                          autofillHints: const [AutofillHints.name],
+                                          onFieldSubmitted: (_) => _userNode.requestFocus(),
+                                          validator: (v) {
+                                            final s = (v ?? '').trim();
+                                            if (s.isEmpty) return 'Required';
+                                            if (s.length < 3) return 'Enter your name';
+                                            return null;
+                                          },
+                                          decoration: InputDecoration(
+                                            labelText: 'Full name',
+                                            hintText: 'Your name',
+                                            prefixIcon: Icon(
+                                              Icons.person_outline_rounded,
+                                              color: Colors.white.withValues(alpha: 0.65),
+                                            ),
+                                          ),
+                                        ),
+
+                                        const SizedBox(height: 14),
+
+                                        // Username
+                                        TextFormField(
+                                          controller: usernameCtrl,
+                                          focusNode: _userNode,
+                                          textInputAction: TextInputAction.next,
+                                          autofillHints: const [AutofillHints.username],
+                                          onFieldSubmitted: (_) => _passNode.requestFocus(),
+                                          validator: (v) {
+                                            final s = (v ?? '').trim();
+                                            if (s.isEmpty) return 'Required';
+                                            final ok = RegExp(r'^[a-zA-Z0-9._]{3,20}$').hasMatch(s);
+                                            if (!ok) return '3–20 chars (letters, numbers, . _)';
+                                            return null;
+                                          },
+                                          decoration: InputDecoration(
+                                            labelText: 'Username',
+                                            hintText: 'username',
+                                            prefixIcon: Icon(
+                                              Icons.badge_outlined,
+                                              color: Colors.white.withValues(alpha: 0.65),
+                                            ),
+                                          ),
+                                        ),
+
+                                        const SizedBox(height: 14),
+
+                                        // Password
+                                        TextFormField(
+                                          controller: passCtrl,
+                                          focusNode: _passNode,
+                                          obscureText: hidePassword,
+                                          textInputAction: TextInputAction.next,
+                                          autofillHints: const [AutofillHints.newPassword],
+                                          onFieldSubmitted: (_) => _confirmNode.requestFocus(),
+                                          validator: (v) {
+                                            final s = v ?? '';
+                                            if (s.isEmpty) return 'Required';
+                                            if (s.length < 6) return 'Min 6 characters';
+                                            return null;
+                                          },
+                                          decoration: InputDecoration(
+                                            labelText: 'Password',
+                                            hintText: '••••••••',
+                                            prefixIcon: Icon(
+                                              Icons.lock_outline_rounded,
+                                              color: Colors.white.withValues(alpha: 0.65),
+                                            ),
+                                            suffixIcon: IconButton(
+                                              tooltip: hidePassword ? 'Show password' : 'Hide password',
+                                              onPressed: () => setState(() => hidePassword = !hidePassword),
+                                              icon: Icon(
+                                                hidePassword
+                                                    ? Icons.visibility_off_rounded
+                                                    : Icons.visibility_rounded,
                                                 color: Colors.white.withValues(alpha: 0.70),
-                                                fontSize: 12,
                                               ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-                                      const SizedBox(height: 16),
-
-                                      SizedBox(
-                                        height: 54,
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            elevation: 0,
-                                            backgroundColor:
-                                                Colors.white.withValues(alpha: 0.92),
-                                            foregroundColor: datacColor,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(16),
-                                            ),
-                                          ),
-                                          onPressed: agree ? _signup : null,
-                                          child: const Text(
-                                            'Create account',
-                                            style: TextStyle(
-                                              fontFamily: 'Inter',
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 14.5,
                                             ),
                                           ),
                                         ),
-                                      ),
 
-                                      const SizedBox(height: 14),
+                                        const SizedBox(height: 14),
 
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Already have an account? ",
-                                            style: TextStyle(
-                                              fontFamily: 'Inter',
-                                              color: Colors.white.withValues(alpha: 0.60),
-                                              fontSize: 12,
+                                        // Confirm password
+                                        TextFormField(
+                                          controller: confirmCtrl,
+                                          focusNode: _confirmNode,
+                                          obscureText: hideConfirm,
+                                          textInputAction: TextInputAction.done,
+                                          autofillHints: const [AutofillHints.newPassword],
+                                          onFieldSubmitted: (_) => agree ? _signup() : null,
+                                          validator: (v) {
+                                            final s = v ?? '';
+                                            if (s.isEmpty) return 'Required';
+                                            if (s != passCtrl.text) return 'Passwords do not match';
+                                            return null;
+                                          },
+                                          decoration: InputDecoration(
+                                            labelText: 'Confirm password',
+                                            hintText: '••••••••',
+                                            prefixIcon: Icon(
+                                              Icons.lock_outline_rounded,
+                                              color: Colors.white.withValues(alpha: 0.65),
                                             ),
-                                          ),
-                                          GestureDetector(
-                                            onTap: () => Navigator.pushReplacementNamed(
-                                              context,
-                                              LoginScreen.route,
-                                            ),
-                                            child: const Text(
-                                              "Log In",
-                                              style: TextStyle(
-                                                fontFamily: 'Inter',
-                                                fontWeight: FontWeight.w700,
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                                decoration: TextDecoration.underline,
+                                            suffixIcon: IconButton(
+                                              tooltip: hideConfirm ? 'Show password' : 'Hide password',
+                                              onPressed: () => setState(() => hideConfirm = !hideConfirm),
+                                              icon: Icon(
+                                                hideConfirm
+                                                    ? Icons.visibility_off_rounded
+                                                    : Icons.visibility_rounded,
+                                                color: Colors.white.withValues(alpha: 0.70),
                                               ),
                                             ),
                                           ),
+                                        ),
+
+                                        const SizedBox(height: 12),
+
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: Checkbox(
+                                                value: agree,
+                                                onChanged: (v) => setState(() => agree = v ?? false),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Text(
+                                                'I agree to the Terms & Privacy',
+                                                style: text.bodySmall?.copyWith(
+                                                  color: Colors.white.withValues(alpha: 0.70),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
+                                        if (!agree) ...[
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            'Please accept Terms & Privacy to continue.',
+                                            style: text.bodySmall?.copyWith(
+                                              color: Colors.white.withValues(alpha: 0.55),
+                                              fontSize: 11.5,
+                                            ),
+                                          ),
                                         ],
-                                      ),
-                                    ],
+
+                                        const SizedBox(height: 16),
+
+                                        ElevatedButton(
+                                          onPressed: agree ? _signup : null,
+                                          child: const Text('Create account'),
+                                        ),
+
+                                        const SizedBox(height: 14),
+
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "Already have an account? ",
+                                              style: text.bodySmall?.copyWith(
+                                                color: Colors.white.withValues(alpha: 0.60),
+                                              ),
+                                            ),
+                                            GestureDetector(
+                                              onTap: () => Navigator.pushReplacementNamed(
+                                                context,
+                                                LoginScreen.route,
+                                              ),
+                                              child: const Text(
+                                                "Log In",
+                                                style: TextStyle(
+                                                  fontFamily: 'Inter',
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                  decoration: TextDecoration.underline,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -364,55 +384,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _input({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required bool obscure,
-    required String? Function(String?) validator,
-    Widget? prefix,
-    Widget? suffix,
-  }) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscure,
-      validator: validator,
-      style: const TextStyle(
-        fontFamily: 'Inter',
-        color: Colors.white,
-        fontSize: 13.2,
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        labelStyle: TextStyle(
-          fontFamily: 'Inter',
-          color: Colors.white.withValues(alpha: 0.70),
-          fontSize: 12.5,
-        ),
-        hintStyle: TextStyle(
-          fontFamily: 'Inter',
-          color: Colors.white.withValues(alpha: 0.40),
-          fontSize: 12.8,
-        ),
-        prefixIcon: prefix,
-        suffixIcon: suffix,
-        filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.06),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.35)),
-        ),
       ),
     );
   }
