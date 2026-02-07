@@ -27,7 +27,10 @@ This app includes dashboard screens, project management actions, and navigation 
 
 ## 📸 Screenshots
 
-![Dashboard Screenshot](assets/images/loginpage.jpg)  
+<p align="center">
+  <img src="assets/images/loginpage.jpg" width="300"/>
+</p>
+
 *Add screenshots of your UI here*
 
 ---
