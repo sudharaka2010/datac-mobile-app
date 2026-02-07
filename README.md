@@ -27,7 +27,7 @@ This app includes dashboard screens, project management actions, and navigation 
 
 ## 📸 Screenshots
 
-![Dashboard Screenshot](assets/images/bg_dark.png)  
+![Dashboard Screenshot](assets/images/loginpage.jpg)  
 *Add screenshots of your UI here*
 
 ---
